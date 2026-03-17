@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>{% block title %}VoiceAI{% endblock %}</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d0f1a;--s1:#131625;--s2:#181c2e;--s3:#1e2338;
+  --border:#252a42;--border2:#2e3450;
+  --acc:#5b7fff;--acc2:#ff6b9d;--acc3:#00d4aa;
+  --text:#e4e8f0;--muted:#6b7399;--muted2:#9298b8;
+  --green:#22c97a;--yellow:#f5c842;--red:#f26767;
+  --r:10px;--r2:16px;
+}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh}
+a{color:var(--acc);text-decoration:none}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:10px 20px;border-radius:var(--r);border:none;font-size:14px;font-weight:500;cursor:pointer;transition:all .18s;font-family:inherit}
+.btn-primary{background:var(--acc);color:#fff}.btn-primary:hover{background:#4a6dee}
+.btn-secondary{background:var(--s3);color:var(--text);border:1px solid var(--border2)}.btn-secondary:hover{background:var(--border2)}
+.btn-danger{background:var(--red);color:#fff}.btn-danger:hover{background:#d94f4f}
+.btn-success{background:var(--green);color:#0d0f1a}.btn-success:hover{background:#1aad68}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+/* Toast */
+.tc{position:fixed;bottom:22px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--s2);border:1px solid var(--border2);border-radius:var(--r);padding:11px 16px;font-size:13px;max-width:320px;display:flex;align-items:center;gap:9px;animation:tIn .25s ease}
+.toast.success{border-left:3px solid var(--green)}.toast.error{border-left:3px solid var(--red)}.toast.info{border-left:3px solid var(--acc)}
+@keyframes tIn{from{transform:translateX(110%);opacity:0}to{transform:none;opacity:1}}
+.spinner{width:18px;height:18px;border:2px solid rgba(255,255,255,.15);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+{% block head %}{% endblock %}
+</head>
+<body>
+{% block body %}{% endblock %}
+<div class="tc" id="TC"></div>
+<script>
+function showToast(msg,type='info',dur=4000){
+  const tc=document.getElementById('TC'),el=document.createElement('div');
+  el.className='toast '+type;
+  el.innerHTML='<span>'+({'success':'✅','error':'❌','info':'ℹ️'}[type]||'ℹ️')+'</span><span>'+msg+'</span>';
+  tc.appendChild(el);setTimeout(()=>el.remove(),dur);
+}
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

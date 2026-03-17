@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}VoiceAI – Login{% endblock %}
+{% block head %}
+<style>
+.wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.box{width:100%;max-width:420px}
+.logo{text-align:center;margin-bottom:28px}
+.logo h1{font-size:30px;font-weight:700;background:linear-gradient(135deg,var(--acc),var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.logo p{color:var(--muted);font-size:13px;margin-top:5px}
+.card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:30px}
+.fg{margin-bottom:16px}
+.fg label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.fg input{width:100%;padding:11px 13px;background:var(--bg);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-size:14px;font-family:inherit;transition:border-color .2s}
+.fg input:focus{outline:none;border-color:var(--acc)}
+.full{width:100%;justify-content:center;padding:12px}
+.div{text-align:center;color:var(--muted);font-size:12px;margin:16px 0;position:relative}
+.div::before,.div::after{content:'';position:absolute;top:50%;width:44%;height:1px;background:var(--border)}
+.div::before{left:0}.div::after{right:0}
+.btn-google{width:100%;justify-content:center;background:#fff;color:#333;margin-bottom:8px}
+.btn-google:hover{background:#f0f0f0}
+.btn-voice{width:100%;justify-content:center;background:var(--s2);border:1px solid var(--border2)}
+.btn-voice:hover{background:var(--s3)}
+.btn-voice.on{border-color:var(--red);background:rgba(242,103,103,.1);animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.65}}
+.vstatus{font-size:12px;color:var(--muted);text-align:center;margin-top:6px;min-height:18px}
+.foot{text-align:center;margin-top:18px;font-size:13px;color:var(--muted)}
+</style>
+{% endblock %}
+{% block body %}
+<div class="wrap">
+  <div class="box">
+    <div class="logo"><h1>🎙️ VoiceAI</h1><p>Multilingual voice assistant</p></div>
+    <div class="card">
+      <div class="fg"><label>Username</label><input id="U" type="text" placeholder="Enter username" autocomplete="username"/></div>
+      <div class="fg"><label>Password</label><input id="P" type="password" placeholder="Enter password" autocomplete="current-password"/></div>
+      <button class="btn btn-primary full" onclick="doLogin()">Sign In</button>
+      {% if google_configured %}
+      <div class="div">or</div>
+      <a href="/auth/google" class="btn btn-google">
+        <svg width="17" height="17" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        Continue with Google
+      </a>
+      {% endif %}
+      <div class="div">or voice login</div>
+      <button class="btn btn-voice" id="VB" onclick="voiceLogin()">🎤 Say your username</button>
+      <div class="vstatus" id="VS"></div>
+    </div>
+    <div class="foot">No account? <a href="/signup">Sign up</a></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.getElementById('P').onkeydown=e=>{if(e.key==='Enter')doLogin()};
+async function doLogin(){
+  const u=document.getElementById('U').value.trim(),p=document.getElementById('P').value;
+  if(!u||!p){showToast('Fill all fields','error');return}
+  const d=await fetch('/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})}).then(r=>r.json());
+  if(d.success){showToast('Welcome!','success');setTimeout(()=>location.href=d.redirect,400)}
+  else showToast(d.message,'error');
+}
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+let vRec=null,vOn=false;
+function voiceLogin(){
+  if(!SR){showToast('Use Chrome for voice','error');return}
+  if(vOn){vRec&&vRec.stop();return}
+  vRec=new SR();vRec.lang='en-US';vRec.interimResults=false;
+  const vb=document.getElementById('VB'),vs=document.getElementById('VS');
+  vRec.onstart=()=>{vOn=true;vb.classList.add('on');vb.textContent='⏹ Listening…';vs.textContent='Say your username…'};
+  vRec.onresult=async e=>{
+    const spoken=e.results[0][0].transcript.trim();
+    vs.textContent='Heard: "'+spoken+'"';
+    if(/google/i.test(spoken)){location.href='/auth/google';return}
+    const d=await fetch('/voice-login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:spoken})}).then(r=>r.json());
+    if(d.success){showToast('Voice login!','success');setTimeout(()=>location.href=d.redirect,400)}
+    else if(d.action==='google_oauth'){location.href='/auth/google'}
+    else{showToast(d.message,'error');vs.textContent=d.message}
+  };
+  vRec.onerror=e=>{
+    const m={'not-allowed':'🚫 Click 🔒 → Allow mic','no-speech':'🔇 Nothing heard','audio-capture':'🎙 No mic found'};
+    showToast(m[e.error]||e.error,'error');vs.textContent=m[e.error]||e.error;
+  };
+  vRec.onend=()=>{vOn=false;vb.classList.remove('on');vb.innerHTML='🎤 Say your username'};
+  vRec.start();
+}
+</script>
+{% endblock %}

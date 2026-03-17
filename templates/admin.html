@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% block title %}VoiceAI – Admin{% endblock %}
+{% block head %}
+<style>
+.wrap{display:flex;min-height:100vh}
+.side{width:200px;background:var(--s1);border-right:1px solid var(--border);padding:20px 0;flex-shrink:0}
+.side h2{padding:0 16px 16px;font-size:16px;font-weight:600;border-bottom:1px solid var(--border);margin-bottom:8px}
+.sn{display:flex;align-items:center;gap:8px;padding:9px 16px;color:var(--muted);font-size:14px;cursor:pointer;transition:all .15s;border-left:3px solid transparent}
+.sn:hover{color:var(--text);background:var(--s2)}
+.sn.active{color:var(--acc);background:rgba(91,127,255,.08);border-left-color:var(--acc)}
+.main{flex:1;padding:24px;overflow-y:auto}
+.atabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.atab{padding:7px 15px;border-radius:7px;border:1px solid var(--border);background:transparent;color:var(--muted);font-size:13px;cursor:pointer;font-family:inherit;transition:all .15s}
+.atab:hover{color:var(--text);border-color:var(--border2)}
+.atab.active{background:rgba(91,127,255,.12);border-color:var(--acc);color:var(--acc)}
+.apanel{display:none;flex-direction:column;gap:14px}
+.apanel.active{display:flex}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:16px}
+.stile{background:var(--s2);border:1px solid var(--border);border-radius:var(--r);padding:16px;text-align:center}
+.sn2{font-size:28px;font-weight:700;color:var(--acc)}
+.sl{font-size:11px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.5px}
+.card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r2);padding:16px}
+.card h3{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.svc-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border)}
+.svc-row:last-child{border-bottom:none}
+.badge{display:inline-flex;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.badge.ok{background:rgba(34,201,122,.1);color:var(--green)}
+.badge.fail{background:rgba(242,103,103,.1);color:var(--red)}
+.badge.inf{background:rgba(91,127,255,.1);color:var(--acc)}
+.badge.pu{background:rgba(255,107,157,.1);color:var(--acc2)}
+.feed{display:flex;gap:9px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border)}
+.feed:last-child{border-bottom:none}
+.fdot{width:7px;height:7px;border-radius:50%;background:var(--acc);margin-top:5px;flex-shrink:0}
+.fdot.err{background:var(--red)}
+.ft{font-size:11px;color:var(--muted);font-family:monospace;white-space:nowrap}
+.fm{font-size:13px;color:var(--muted2)}
+.fm strong{color:var(--text)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{padding:8px 11px;text-align:left;color:var(--muted);font-weight:500;border-bottom:1px solid var(--border);font-size:11px;text-transform:uppercase;letter-spacing:.5px}
+td{padding:8px 11px;border-bottom:1px solid rgba(37,42,66,.5);color:var(--muted2);vertical-align:middle}
+td strong{color:var(--text)}
+.tbl{overflow-x:auto}
+.ab{padding:4px 9px;border-radius:5px;font-size:11px;border:1px solid var(--border2);background:var(--s3);color:var(--muted2);cursor:pointer;font-family:inherit;transition:all .15s;margin-right:3px}
+.ab:hover{background:var(--acc);color:#fff;border-color:var(--acc)}
+.ab.del{border-color:rgba(242,103,103,.4);color:var(--red)}
+.ab.del:hover{background:var(--red);color:#fff}
+.apib{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(37,42,66,.4)}
+.apib:last-child{border-bottom:none}
+.apn{font-size:13px;color:var(--muted2);width:180px;flex-shrink:0}
+.apt{flex:1;height:5px;background:var(--s3);border-radius:3px;overflow:hidden}
+.apf{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));border-radius:3px;transition:width .6s}
+.apc{font-size:12px;color:var(--muted);width:36px;text-align:right;font-family:monospace}
+.eitem{background:rgba(242,103,103,.04);border:1px solid rgba(242,103,103,.14);border-radius:var(--r);padding:11px 13px;margin-bottom:8px}
+.ert{font-size:11px;color:var(--red);font-family:monospace;margin-bottom:3px}
+.erm{font-size:13px;color:var(--muted2)}
+.emt{font-size:11px;color:var(--muted);margin-top:3px}
+</style>
+{% endblock %}
+{% block body %}
+<div class="wrap">
+  <aside class="side">
+    <h2>⚙️ Admin</h2>
+    <div class="sn active" onclick="aTab('overview',this)">📊 Overview</div>
+    <div class="sn" onclick="aTab('activity',this)">📋 Activity</div>
+    <div class="sn" onclick="aTab('users',this)">👥 Users</div>
+    <div class="sn" onclick="aTab('errors',this)">⚠️ Errors</div>
+    <div class="sn" onclick="aTab('api',this)">📡 API Usage</div>
+    <div class="sn" onclick="aTab('logins',this)">🔐 Logins</div>
+    <div style="margin-top:auto;padding:16px">
+      <a href="/dashboard" class="btn btn-secondary" style="width:100%;justify-content:center;display:flex;margin-bottom:8px;font-size:13px">← Dashboard</a>
+      <a href="/logout" class="btn btn-danger" style="width:100%;justify-content:center;display:flex;font-size:13px">Sign Out</a>
+    </div>
+  </aside>
+  <main class="main">
+    <div style="margin-bottom:18px">
+      <h1 style="font-size:20px;font-weight:600">Admin Dashboard</h1>
+      <p style="color:var(--muted);font-size:13px">Logged in as <strong style="color:var(--text)">{{ admin_username }}</strong></p>
+    </div>
+    <div class="atabs" style="display:none"><!-- tabs in sidebar --></div>
+
+    <div class="apanel active" id="ap-overview">
+      <div class="sgrid">
+        <div class="stile"><div class="sn2" id="as-u">–</div><div class="sl">Users</div></div>
+        <div class="stile"><div class="sn2" id="as-a" style="color:var(--green)">–</div><div class="sl">Active</div></div>
+        <div class="stile"><div class="sn2" id="as-ac" style="color:var(--acc2)">–</div><div class="sl">Actions</div></div>
+        <div class="stile"><div class="sn2" id="as-ap" style="color:var(--yellow)">–</div><div class="sl">API Calls</div></div>
+        <div class="stile"><div class="sn2" id="as-e" style="color:var(--red)">–</div><div class="sl">Errors</div></div>
+      </div>
+      <div class="grid2">
+        <div class="card"><h3>System health</h3><div id="a-sys"></div></div>
+        <div class="card"><h3>Recent activity</h3><div id="a-feed"></div></div>
+      </div>
+    </div>
+
+    <div class="apanel" id="ap-activity">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:13px;color:var(--muted);font-weight:500">ACTION LOG</span>
+        <button class="ab" onclick="loadAct()">↻ Refresh</button>
+      </div>
+      <div class="card"><div class="tbl"><table>
+        <thead><tr><th>Time</th><th>User</th><th>Action</th><th>Detail</th><th>Status</th></tr></thead>
+        <tbody id="a-act"></tbody>
+      </table></div></div>
+    </div>
+
+    <div class="apanel" id="ap-users">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:13px;color:var(--muted);font-weight:500">USER MANAGEMENT</span>
+        <button class="ab" onclick="loadUsr()">↻ Refresh</button>
+      </div>
+      <div class="card"><div class="tbl"><table>
+        <thead><tr><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Login</th><th>Actions</th></tr></thead>
+        <tbody id="a-usr"></tbody>
+      </table></div></div>
+    </div>
+
+    <div class="apanel" id="ap-errors">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span style="font-size:13px;color:var(--muted);font-weight:500">ERROR LOG</span>
+        <div style="display:flex;gap:8px">
+          <button class="ab" onclick="loadErr()">↻ Refresh</button>
+          <button class="ab del" onclick="clrErr()">🗑 Clear</button>
+        </div>
+      </div>
+      <div id="a-err"></div>
+    </div>
+
+    <div class="apanel" id="ap-api">
+      <div class="card">
+        <h3>API usage — total: <span id="a-api-t" style="color:var(--acc);font-family:monospace">0</span></h3>
+        <div id="a-api-b"></div>
+      </div>
+    </div>
+
+    <div class="apanel" id="ap-logins">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span style="font-size:13px;color:var(--muted);font-weight:500">LOGIN HISTORY</span>
+        <button class="ab" onclick="loadLogins()">↻ Refresh</button>
+      </div>
+      <div class="card"><div class="tbl"><table>
+        <thead><tr><th>Time</th><th>Username</th><th>Method</th><th>IP</th><th>Result</th></tr></thead>
+        <tbody id="a-logins"></tbody>
+      </table></div></div>
+    </div>
+  </main>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const esc=s=>String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function aTab(n,btn){
+  document.querySelectorAll('.apanel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('ap-'+n).classList.add('active');
+  btn.classList.add('active');
+  const fns={activity:loadAct,users:loadUsr,errors:loadErr,api:loadApi,logins:loadLogins};
+  if(fns[n])fns[n]();
+}
+async function loadAdm(){
+  const d=await fetch('/api/admin/stats').then(r=>r.json()).catch(()=>null);if(!d)return;
+  document.getElementById('as-u').textContent=d.total_users;
+  document.getElementById('as-a').textContent=d.active_users;
+  document.getElementById('as-ac').textContent=d.total_actions;
+  document.getElementById('as-ap').textContent=d.api_total;
+  document.getElementById('as-e').textContent=d.total_errors;
+  const s=d.system;
+  document.getElementById('a-sys').innerHTML=[['✈️ Telegram',s.telegram_ok],['📧 Gmail',s.gmail_ok],['🤖 OpenAI',s.openai_ok],['🔑 Google OAuth',s.google_ok]]
+    .map(([n,ok])=>`<div class="svc-row"><span style="font-size:13px;font-weight:500">${n}</span><span class="badge ${ok?'ok':'fail'}">${ok?'✓ OK':'✗ Not set'}</span></div>`).join('');
+  document.getElementById('a-feed').innerHTML=(d.recent_actions||[]).slice(-8).reverse()
+    .map(l=>`<div class="feed"><div class="fdot ${l.status!=='success'?'err':''}"></div><div class="ft">${l.timestamp.split(' ')[1]}</div><div class="fm"><strong>${esc(l.user)}</strong> — ${esc(l.action)}${l.detail?' <span style="color:var(--muted)">'+esc(l.detail)+'</span>':''}</div></div>`).join('')
+    ||'<p style="color:var(--muted);font-size:13px">No activity yet</p>';
+}
+async function loadAct(){
+  const d=await fetch('/api/admin/logs?limit=100').then(r=>r.json()).catch(()=>({logs:[]}));
+  document.getElementById('a-act').innerHTML=d.logs.map(l=>`<tr><td style="white-space:nowrap;font-size:11px;color:var(--muted)">${l.timestamp}</td><td><strong>${esc(l.user)}</strong></td><td>${esc(l.action)}</td><td style="color:var(--muted);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(l.detail)}</td><td><span class="badge ${l.status==='success'?'ok':'fail'}">${l.status}</span></td></tr>`).join('')
+    ||'<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:18px">No logs yet</td></tr>';
+}
+async function loadUsr(){
+  const d=await fetch('/api/admin/users').then(r=>r.json()).catch(()=>({users:[]}));
+  document.getElementById('a-usr').innerHTML=d.users.map(u=>`<tr><td><strong>${esc(u.username)}</strong></td><td style="color:var(--muted)">${esc(u.email)}</td><td><span class="badge ${u.role==='admin'?'ok':'inf'}">${u.role}</span></td><td><span class="badge ${u.active?'ok':'fail'}">${u.active?'Active':'Off'}</span></td><td style="color:var(--muted);font-size:12px">${esc(u.login_method)}</td><td><button class="ab" onclick="togUsr('${esc(u.username)}')">${u.active?'Disable':'Enable'}</button><button class="ab" onclick="setRole('${esc(u.username)}','${u.role==='admin'?'user':'admin'}')">${u.role==='admin'?'→User':'→Admin'}</button><button class="ab del" onclick="delUsr('${esc(u.username)}')">Del</button></td></tr>`).join('');
+}
+async function togUsr(u){if(!confirm('Toggle '+u+'?'))return;const d=await fetch(`/api/admin/users/${u}/toggle`,{method:'POST'}).then(r=>r.json());showToast(d.message,d.success?'success':'error');loadUsr();}
+async function setRole(u,r){const d=await fetch(`/api/admin/users/${u}/role`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({role:r})}).then(r=>r.json());showToast(d.message,d.success?'success':'error');loadUsr();}
+async function delUsr(u){if(!confirm('Delete '+u+'?'))return;const d=await fetch(`/api/admin/users/${u}/delete`,{method:'POST'}).then(r=>r.json());showToast(d.message,d.success?'success':'error');loadUsr();}
+async function loadErr(){
+  const d=await fetch('/api/admin/errors').then(r=>r.json()).catch(()=>({errors:[]}));
+  document.getElementById('a-err').innerHTML=d.errors.length
+    ?d.errors.map(e=>`<div class="eitem"><div class="ert">${esc(e.route)}</div><div class="erm">${esc(e.error)}</div><div class="emt">${e.timestamp} · ${esc(e.user)}</div></div>`).join('')
+    :'<div style="text-align:center;padding:24px;color:var(--green)">✓ No errors detected</div>';
+}
+async function clrErr(){if(!confirm('Clear all errors?'))return;await fetch('/api/admin/clear-errors',{method:'POST'});showToast('Cleared','success');loadErr();}
+async function loadApi(){
+  const d=await fetch('/api/admin/api-usage').then(r=>r.json()).catch(()=>({usage:{},total:0}));
+  document.getElementById('a-api-t').textContent=d.total;
+  const entries=Object.entries(d.usage||{}).sort((a,b)=>b[1]-a[1]);
+  const mx=entries[0]?entries[0][1]:1;
+  document.getElementById('a-api-b').innerHTML=entries.length
+    ?entries.map(([k,v])=>`<div class="apib"><div class="apn">${esc(k)}</div><div class="apt"><div class="apf" style="width:${Math.round(v/mx*100)}%"></div></div><div class="apc">${v}</div></div>`).join('')
+    :'<p style="color:var(--muted);padding:12px;font-size:13px">No API calls yet</p>';
+}
+async function loadLogins(){
+  const d=await fetch('/api/admin/logins').then(r=>r.json()).catch(()=>({logins:[]}));
+  document.getElementById('a-logins').innerHTML=d.logins.map(l=>`<tr><td style="white-space:nowrap;font-size:11px;color:var(--muted)">${l.timestamp}</td><td><strong>${esc(l.username)}</strong></td><td><span class="badge inf">${esc(l.method)}</span></td><td style="font-family:monospace;font-size:11px;color:var(--muted)">${esc(l.ip)}</td><td><span class="badge ${l.success?'ok':'fail'}">${l.success?'✓ OK':'✗ Fail'}</span></td></tr>`).join('')
+    ||'<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:18px">No logins yet</td></tr>';
+}
+window.addEventListener('load',loadAdm);
+</script>
+{% endblock %}
