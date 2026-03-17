@@ -11,7 +11,7 @@ Features:
 """
 import streamlit as st
 import pandas as pd
-import numpy
+import numpy as np
 import os, sys, hashlib, secrets, asyncio, threading
 import imaplib, smtplib, json, re
 import email as email_lib
