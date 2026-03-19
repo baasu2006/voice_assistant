@@ -863,41 +863,6 @@ def api_status():
         "openai":       bool(OPENAI_API_KEY),
         "google_oauth": bool(os.environ.get("GOOGLE_CLIENT_ID")),
     })
-
-
-# --- STREAMLIT UI START ---
-st.set_page_config(page_title="Voice AI Assistant", layout="centered")
-
-# Initialize login state
-if "logged_in" not in st.session_state:
-    st.session_state["logged_in"] = False
-
-if not st.session_state["logged_in"]:
-    st.title("🔐 Admin Login")
-    input_user = st.text_input("Username")
-    input_pass = st.text_input("Password", type="password")
-    
-    if st.button("Login"):
-        if input_user == ADMIN_USERNAME and input_pass == ADMIN_PASSWORD:
-            st.session_state["logged_in"] = True
-            st.rerun()
-        else:
-            st.error("Invalid credentials")
-else:
-    # This is where your main app lives now
-    st.sidebar.success(f"Logged in as: {st.session_state['username'] or 'Admin'}")
-    if st.sidebar.button("Logout"):
-        st.session_state["logged_in"] = False
-        st.rerun()
-
-    st.title("🎙️ Voice AI Assistant")
-    st.write("The Assistant is ready and listening.")
-
-    # A button to trigger your AI logic
-    user_cmd = st.text_input("Enter a command:")
-    if st.button("Execute"):
-        if user_cmd:
-            with st.spinner("Processing..."):
-                result = ai_voice_command(user_cmd)
-                st.json(result) # Shows the AI action (read_telegram, etc.)
-                st.success(result.get("response", "Command processed"))
+if __name__ == "__main__":
+    print("VoiceAI starting - http://localhost:5000")
+    print("Admin login: " + ADMIN_USERNAME + " / " + ADMIN_PASSWORD)
