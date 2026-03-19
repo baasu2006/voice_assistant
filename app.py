@@ -865,33 +865,7 @@ def api_status():
     })
 
 
-# 1. Create a simple login interface
-def login():
-    st.title("🔒 Admin Login")
-    
-    # Use columns to make it look clean
-    with st.container():
-        username = st.text_input("Username")
-        password = st.text_input("Password", type="password")
-        
-        if st.button("Login"):
-            if username == ADMIN_USERNAME and password == ADMIN_PASSWORD:
-                st.session_state["authenticated"] = True
-                st.rerun() # Refresh to show the app
-            else:
-                st.error("Invalid Username or Password")
-
-# 2. Logic to show either Login or the actual App
-if "authenticated" not in st.session_state:
-    login()
-else:
-    st.success(f"Welcome, {ADMIN_USERNAME}!")
-    st.sidebar.button("Logout", on_click=lambda: st.session_state.clear())
-    
-    # --- YOUR MAIN VOICE AI CODE GOES HERE ---
-    st.write("The Voice AI Assistant is ready.")
-    
-    # Example: If you have a start function:
-    if st.button("Start Voice Assistant"):
-        st.info("Assistant is listening...")
-        # main_assistant_logic()
+if __name__ == "__main__":
+    print("VoiceAI starting - http://localhost:5000")
+    print("Admin login: " + ADMIN_USERNAME + " / " + ADMIN_PASSWORD)
+    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False)
