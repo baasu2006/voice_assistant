@@ -57,3 +57,4 @@ python app.py
 | Read my Gmail | Gmail dekho | Gmail chadavu |
 | Send email to [name] | [name] ko email bhejo | [name] ku email pampinchu |
 | Summarize my messages | Messages ka saar do | Messages samkshepanam |
+my web is live on https://voice-assistant-zvwv.onrender.com
