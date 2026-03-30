@@ -866,5 +866,5 @@ def api_status():
 if __name__ == "__main__":
     print("VoiceAI starting - http://localhost:5000")
     print("Admin login: " + ADMIN_USERNAME + " / " + ADMIN_PASSWORD)
-    app.run(host="0.0.0.0", port=5000, debug=True, use_reloader=False)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
 
