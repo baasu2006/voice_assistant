@@ -48,6 +48,9 @@ python app.py
 - Username: `admin`
 - Password: `admin123`
 - ⚠️ Change in `.env` before deploying!
+- my web is live on https://voice-assistant-zvwv.onrender.com
+- after opening the link wait for sometime as it is render it will take sometime
+
 
 ## Voice Commands
 | English | Hindi | Telugu |
@@ -57,4 +60,3 @@ python app.py
 | Read my Gmail | Gmail dekho | Gmail chadavu |
 | Send email to [name] | [name] ko email bhejo | [name] ku email pampinchu |
 | Summarize my messages | Messages ka saar do | Messages samkshepanam |
-my web is live on https://voice-assistant-zvwv.onrender.com
